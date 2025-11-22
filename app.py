@@ -3,6 +3,8 @@ from datetime import datetime
 import requests
 
 app = Flask(__name__)
+from routes_firebase import bp_firebase
+app.register_blueprint(bp_firebase)
 
 @app.route("/health")
 def health():
