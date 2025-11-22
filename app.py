@@ -1,14 +1,14 @@
 from flask import Flask, request, jsonify
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
+from routes_firebase import bp_firebase
 
 app = Flask(__name__)
-from routes_firebase import bp_firebase
 app.register_blueprint(bp_firebase)
 
 @app.route("/health")
 def health():
-    return jsonify({"status":"ok","time":datetime.utcnow().isoformat()})
+    return jsonify({"status":"ok","time":datetime.now(timezone.utc).isoformat()})
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -23,8 +23,11 @@ def llm():
         "model":"llama3.2:3b",
         "prompt": data.get("message","")
     }
-    r = requests.post("http://127.0.0.1:11434/api/generate", json=payload)
-    return r.text, r.status_code, {"Content-Type":"application/json"}
+    try:
+        r = requests.post("http://127.0.0.1:11434/api/generate", json=payload, timeout=30)
+        return r.text, r.status_code, {"Content-Type":"application/json"}
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": "LLM service unavailable"}), 503
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8600)
+    app.run(host="127.0.0.1", port=8600)
