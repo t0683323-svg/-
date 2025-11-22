@@ -1,3 +1,4 @@
+"""Firebase routes for device registration."""
 from flask import Blueprint, request, jsonify
 from firebase_init import db
 
@@ -5,6 +6,7 @@ bp_firebase = Blueprint("firebase", __name__)
 
 @bp_firebase.route("/register-device", methods=["POST"])
 def register_device():
+    """Register device with FCM token."""
     data = request.json or {}
     device_id = data.get("device_id")
     token = data.get("fcm_token")
