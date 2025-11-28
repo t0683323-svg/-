@@ -36,6 +36,22 @@ Notification system tests:
 
 ## Running Tests
 
+### Quick Start (Recommended)
+Use the convenient test runner script:
+```bash
+# Run all tests with coverage
+./run_tests.sh
+
+# Run with verbose output and HTML report
+./run_tests.sh --verbose --html
+
+# Run with custom coverage threshold
+./run_tests.sh --threshold 90
+
+# Show all options
+./run_tests.sh --help
+```
+
 ### Install Dependencies
 ```bash
 pip install -r requirements.txt
@@ -62,6 +78,31 @@ pytest test_routes_notify.py -v
 ```bash
 pytest test_app.py::TestHealthEndpoint::test_health_endpoint_returns_ok -v
 ```
+
+## Continuous Integration
+
+This project uses **GitHub Actions** to automatically run tests on every push and pull request.
+
+### Workflow Configuration
+- **File**: `.github/workflows/test.yml`
+- **Triggers**: Push to main/master/develop/claude/* branches, PRs to main/master/develop
+- **Python Versions**: 3.11, 3.12 (matrix testing)
+- **Coverage Threshold**: 95% minimum
+- **Artifacts**: HTML coverage reports stored for 30 days
+
+### CI Features
+- ✅ Automatic test execution on every commit
+- ✅ Coverage reporting with threshold enforcement
+- ✅ Multi-Python version testing (3.11, 3.12)
+- ✅ HTML coverage reports as downloadable artifacts
+- ✅ Test summary in PR comments
+- ✅ Integration with Codecov (optional)
+
+### Viewing CI Results
+1. Navigate to the **Actions** tab in GitHub
+2. Click on the latest workflow run
+3. View test results and download coverage reports
+4. Coverage reports are available as artifacts for 30 days
 
 ## Coverage Reports
 
