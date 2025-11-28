@@ -5,8 +5,9 @@ from unittest.mock import Mock, MagicMock, patch
 import firebase_admin
 from firebase_admin import credentials
 
-# Set environment variable to prevent Firebase initialization during tests
+# Set environment variables for testing
 os.environ["FIREBASE_CREDENTIALS"] = "/dev/null"
+os.environ["API_KEY"] = "test-api-key-12345"
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -61,8 +62,40 @@ def mock_fcm():
 
 @pytest.fixture
 def client(mock_firestore):
-    """Create Flask test client with mocked Firebase."""
+    """Create Flask test client with mocked Firebase and API key."""
     # Import app here to ensure Firebase mocking is in place
+    from app import app
+
+    app.config['TESTING'] = True
+
+    # Create a custom test client class that adds API key to all requests
+    class AuthenticatedClient:
+        def __init__(self, test_client):
+            self.test_client = test_client
+
+        def get(self, *args, **kwargs):
+            kwargs.setdefault('headers', {})['X-API-Key'] = 'test-api-key-12345'
+            return self.test_client.get(*args, **kwargs)
+
+        def post(self, *args, **kwargs):
+            kwargs.setdefault('headers', {})['X-API-Key'] = 'test-api-key-12345'
+            return self.test_client.post(*args, **kwargs)
+
+        def put(self, *args, **kwargs):
+            kwargs.setdefault('headers', {})['X-API-Key'] = 'test-api-key-12345'
+            return self.test_client.put(*args, **kwargs)
+
+        def delete(self, *args, **kwargs):
+            kwargs.setdefault('headers', {})['X-API-Key'] = 'test-api-key-12345'
+            return self.test_client.delete(*args, **kwargs)
+
+    with app.test_client() as test_client:
+        yield AuthenticatedClient(test_client)
+
+
+@pytest.fixture
+def unauthorized_client(mock_firestore):
+    """Create Flask test client without API key for testing auth."""
     from app import app
 
     app.config['TESTING'] = True
