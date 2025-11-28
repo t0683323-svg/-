@@ -1,4 +1,5 @@
 """Flask application with health, chat, and LLM endpoints."""
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime, timezone
@@ -10,6 +11,32 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 app.register_blueprint(bp_firebase)
 app.register_blueprint(bp_notify)
+
+
+@app.before_request
+def require_api_key():
+    """Verify API key for all requests except health check and OPTIONS."""
+    # Allow OPTIONS requests (for CORS preflight)
+    if request.method == 'OPTIONS':
+        return
+
+    # Allow health check without authentication (for monitoring)
+    if request.endpoint == 'health':
+        return
+
+    # Get API key from request headers
+    api_key = request.headers.get('X-API-Key')
+    expected_key = os.environ.get('API_KEY')
+
+    # If API_KEY is not configured, allow requests (backward compatibility)
+    # In production, you should make this mandatory by removing this check
+    if not expected_key:
+        app.logger.warning("API_KEY environment variable not set - authentication disabled")
+        return
+
+    # Verify API key
+    if api_key != expected_key:
+        return jsonify({'error': 'Unauthorized - valid API key required'}), 401
 
 @app.route("/health")
 def health():
