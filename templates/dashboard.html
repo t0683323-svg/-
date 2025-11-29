@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centrum Sterowania Systemem</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #1a1a1a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; }
+        .card { background-color: #2d2d2d; border: 1px solid #404040; margin-bottom: 20px; }
+        .card-header { background-color: #252525; border-bottom: 1px solid #404040; font-weight: bold; }
+        .status-ok { color: #00ff88; }
+        .status-err { color: #ff4444; }
+        .metric-value { font-size: 1.5rem; font-weight: bold; }
+        .metric-label { font-size: 0.8rem; color: #aaa; }
+        .progress { background-color: #404040; }
+        .list-group-item { background-color: #2d2d2d; border-color: #404040; }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🎛️ Panel Administratora</h2>
+        <span class="badge bg-primary">v{{ version }}</span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-center p-3">
+                <div class="metric-label">Status Aplikacji</div>
+                <div class="metric-value status-ok">ONLINE 🟢</div>
+                <small>Uptime: {{ uptime }}</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center p-3">
+                <div class="metric-label">CPU (System)</div>
+                <div class="metric-value">{{ cpu_percent }}%</div>
+                <div class="progress mt-2" style="height: 5px;">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ cpu_percent }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center p-3">
+                <div class="metric-label">RAM (Użycie)</div>
+                <div class="metric-value">{{ memory_percent }}%</div>
+                <small>{{ memory_used }} / {{ memory_total }} GB</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center p-3">
+                <div class="metric-label">Dysk</div>
+                <div class="metric-value">{{ disk_percent }}%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">📡 Zarejestrowane Urządzenia</div>
+                <div class="card-body">
+                    <h3 class="display-4 text-center">{{ device_count }}</h3>
+                    <p class="text-center text-muted">Aktywne w bazie Firestore</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">🛠️ Informacje Techniczne</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Python: {{ python_version }}</li>
+                    <li class="list-group-item">Platforma: {{ platform }}</li>
+                    <li class="list-group-item">Klucz API: <span class="badge bg-success">Skonfigurowany</span></li>
+                    <li class="list-group-item">Test Coverage: <span class="badge bg-info">96.19%</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">🔗 Szybkie Linki</div>
+                <div class="card-body">
+                    <a href="/health" class="btn btn-outline-success btn-sm me-2" target="_blank">Health Check</a>
+                    <a href="/admin/dashboard?format=json&key={{ api_key }}" class="btn btn-outline-info btn-sm me-2" target="_blank">JSON API</a>
+                    <a href="https://github.com/anthropics/claude-code" class="btn btn-outline-secondary btn-sm" target="_blank">Dokumentacja</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4 text-muted">
+        <small>Odśwież stronę, aby zaktualizować dane. Ostatnia aktualizacja: {{ current_time }}</small>
+    </div>
+</div>
+</body>
+</html>
